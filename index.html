@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DownloadHub - Tempat Download Keren</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    button:active { transform: scale(0.97); }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-slate-50 to-white min-h-screen text-slate-800">
+
+  <!-- Header -->
+  <header class="max-w-6xl mx-auto px-4 py-6 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 bg-white shadow-md rounded-xl px-3 py-2">
+        <i data-lucide="file-text" class="w-5 h-5 text-slate-700"></i>
+        <h1 class="font-semibold text-lg">DownloadHub</h1>
+      </div>
+      <p class="text-sm text-slate-500"></p>
+    </div>
+
+    <div class="relative">
+      <input id="search" type="text" placeholder="Cari file..."
+        class="pl-9 pr-4 py-2 border rounded-xl w-60 shadow-sm focus:outline-none" />
+      <i data-lucide="search" class="w-5 h-5 text-slate-400 absolute left-2.5 top-2.5"></i>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-6">
+    <section class="md:col-span-2 space-y-4" id="file-list">
+      <!-- File cards akan dimuat via JS -->
+    </section>
+
+    <aside class="space-y-4">
+      <div class="bg-white p-4 rounded-2xl shadow-md">
+        <h4 class="font-semibold mb-2 flex items-center gap-2">
+          <i data-lucide="filter" class="w-4 h-4"></i> Kategori
+        </h4>
+        <div id="filter-buttons" class="flex flex-wrap gap-2 text-sm">
+          <button data-tag="all" class="px-3 py-1 bg-slate-900 text-white rounded-full">Semua</button>
+          <button data-tag="new" class="px-3 py-1 bg-slate-100 rounded-full">Terbaru</button>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-2xl shadow-md text-sm">
+        <h4 class="font-semibold mb-2">Tentang</h4>
+        <p class="text-slate-500">Website demo tempat download file dengan tampilan modern dan bisa pasang gambar bebas.</p>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const files = [
+  {
+    id: 1,
+    title: "Zero Two MD",
+    size: "2.46 MB",
+    downloads: 300,
+    likes: 30,
+    dislikes: 1,
+    desc: "Script Bot MD All Fitur work.",
+    url: "https://sfl.gl/kOMLVx",
+    image: "https://files.catbox.moe/f9pwdf.jpg"
+  },
+  {
+    id: 2,
+    title: "Coming Soon",
+    size: "0.0 MB",
+    downloads: 0,
+    likes: 0,
+    dislikes: 0,
+    desc: "Coming Soon",
+    url: "https://whatsapp.com/channel/0029Vb70djs6rsQzKIonmm1r",
+    image: "https://files.catbox.moe/8dqg2c.jpg"
+  }
+];
+
+    const fileList = document.getElementById("file-list");
+    const searchInput = document.getElementById("search");
+    const filterButtons = document.getElementById("filter-buttons");
+    let currentFiles = [...files];
+
+    // Render daftar file
+    function renderFiles(list) {
+      fileList.innerHTML = "";
+      list.forEach(f => {
+        const card = document.createElement("div");
+        card.className = "bg-white rounded-2xl shadow-md p-4 flex gap-4 items-center hover:shadow-lg transition";
+
+        const imageHTML = f.image
+          ? `<img src="${f.image}" alt="${f.title}" class="w-20 h-20 object-cover rounded-xl">`
+          : `<div class="w-20 h-20 flex items-center justify-center bg-slate-100 rounded-xl">
+               <i data-lucide="file-archive" class="w-7 h-7 text-slate-500"></i>
+             </div>`;
+
+        card.innerHTML = `
+          ${imageHTML}
+          <div class="flex-1">
+            <h3 class="font-semibold">${f.title}</h3>
+            <p class="text-xs text-slate-500 mt-1">${f.desc}</p>
+            <div class="flex items-center gap-3 mt-3 text-xs text-slate-500">
+              <div class="flex items-center gap-1"><i data-lucide="download-cloud" class="w-4 h-4"></i> <span id="dl-${f.id}">${f.downloads}</span></div>
+              <div class="flex items-center gap-1"><i data-lucide="thumbs-up" class="w-4 h-4"></i> <span id="like-${f.id}">${f.likes}</span></div>
+              <div class="flex items-center gap-1"><i data-lucide="thumbs-down" class="w-4 h-4"></i> <span id="dislike-${f.id}">${f.dislikes}</span></div>
+            </div>
+          </div>
+          <div class="flex flex-col gap-2">
+            <button data-id="${f.id}" class="btn-download bg-emerald-600 text-white text-sm px-3 py-1 rounded-lg flex items-center gap-1">
+              <i data-lucide='download-cloud' class='w-4 h-4'></i> Download
+            </button>
+            <div class="flex gap-1">
+              <button data-id="${f.id}" class='btn-like p-2 bg-white border rounded-lg'>
+                <i data-lucide='thumbs-up' class='w-4 h-4'></i>
+              </button>
+              <button data-id="${f.id}" class='btn-dislike p-2 bg-white border rounded-lg'>
+                <i data-lucide='thumbs-down' class='w-4 h-4'></i>
+              </button>
+            </div>
+          </div>
+        `;
+        fileList.appendChild(card);
+      });
+
+      lucide.createIcons();
+      attachEvents();
+    }
+
+    // Event tombol download, like, dislike
+    function attachEvents() {
+      document.querySelectorAll(".btn-download").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = parseInt(btn.getAttribute("data-id"));
+          const f = files.find(x => x.id === id);
+          f.downloads++;
+          document.getElementById(`dl-${id}`).textContent = f.downloads;
+          window.open(f.url, "_blank");
+        });
+      });
+
+      document.querySelectorAll(".btn-like").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = parseInt(btn.getAttribute("data-id"));
+          const f = files.find(x => x.id === id);
+          f.likes++;
+          document.getElementById(`like-${id}`).textContent = f.likes;
+        });
+      });
+
+      document.querySelectorAll(".btn-dislike").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = parseInt(btn.getAttribute("data-id"));
+          const f = files.find(x => x.id === id);
+          f.dislikes++;
+          document.getElementById(`dislike-${id}`).textContent = f.dislikes;
+        });
+      });
+    }
+
+    // Search
+    searchInput.addEventListener("input", e => {
+      const q = e.target.value.toLowerCase();
+      const filtered = currentFiles.filter(f => f.title.toLowerCase().includes(q));
+      renderFiles(filtered);
+    });
+
+    // Filter kategori
+    filterButtons.addEventListener("click", e => {
+      if (e.target.tagName === "BUTTON") {
+        document.querySelectorAll("#filter-buttons button").forEach(btn => {
+          btn.classList.remove("bg-slate-900", "text-white");
+          btn.classList.add("bg-slate-100");
+        });
+        e.target.classList.add("bg-slate-900", "text-white");
+
+        const tag = e.target.dataset.tag;
+        if (tag === "all") currentFiles = [...files];
+        else if (tag === "new") currentFiles = [...files].sort((a, b) => b.id - a.id);
+        renderFiles(currentFiles);
+      }
+    });
+
+    renderFiles(files);
+  </script>
+</body>
+</html>
